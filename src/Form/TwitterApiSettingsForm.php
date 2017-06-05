@@ -28,7 +28,7 @@ class TwitterApiSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $twitter_config = $this->configFactory->get('twitter.settings');
+    $twitter_config = $this->configFactory->get('twitter_api.settings');
 
     $form['oauth_access_token'] = array(
       '#type' => 'textfield',
