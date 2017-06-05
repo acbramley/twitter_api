@@ -2,6 +2,8 @@
 
 namespace Drupal\twitter_api\Plugin\Block;
 
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
@@ -126,7 +128,7 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
       $tweets[] = [
         '#theme' => 'twitter_api__tweet',
         '#user_link' => Link::fromTextAndUrl('@' . $tweet['user']['name'], Url::fromUri('https://twitter.com/' . $tweet['user']['screen_name'])),
-        '#text' => $tweet_text,
+        '#text' => new FormattableMarkup($tweet_text, []),
         '#tweet' => $tweet,
       ];
     }
