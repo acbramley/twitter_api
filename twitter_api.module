@@ -11,7 +11,11 @@
 function twitter_api_theme($existing, $type, $theme, $path) {
   return [
     'twitter_api__tweet' => [
-      'variables' => ['tweet' => []],
+      'variables' => [
+        'user_link' => '',
+        'text' => '',
+        'image' => '',
+      ],
       'path' => $path . '/templates',
       'template' => 'twitter-api--tweet',
     ],

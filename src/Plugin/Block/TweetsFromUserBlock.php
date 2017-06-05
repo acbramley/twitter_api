@@ -4,8 +4,11 @@ namespace Drupal\twitter_api\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Url;
 use Drupal\twitter_api\TwitterApiClientInterface;
+use Drupal\twitter_api\TwitterApiEntityExpander;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -29,6 +32,13 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
   protected $client;
 
   /**
+   * The expander service.
+   *
+   * @var \Drupal\twitter_api\TwitterApiEntityExpander
+   */
+  protected $expander;
+
+  /**
    * FacetSearchFormBlock constructor.
    *
    * @param array $configuration
@@ -40,9 +50,10 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
    * @param \Drupal\twitter_api\TwitterApiClientInterface $client
    *   The twitter api client service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, TwitterApiClientInterface $client) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, TwitterApiClientInterface $client, TwitterApiEntityExpander $expander) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->client = $client;
+    $this->expander = $expander;
   }
 
   /**
@@ -53,7 +64,8 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('twitter_api.client')
+      $container->get('twitter_api.client'),
+      $container->get('twitter_api.entity_expander')
     );
   }
 
@@ -104,11 +116,26 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
     $response = $this->client->getTweets($this->configuration['screen_name'], $this->configuration['count']);
     $tweets = [];
     foreach ($response as $tweet) {
-      $tweets[] = ['#theme' => 'twitter_api__tweet', '#tweet' => $tweet];
+      $tweet_text = $tweet['text'];
+      // Replace any urls in the text.
+      $urls = $this->expander->expandUrls($tweet);
+      foreach ($urls as $replace => $url) {
+        $tweet_text = str_replace($replace, $url->toString(), $tweet_text);
+      }
+
+      $tweets[] = [
+        '#theme' => 'twitter_api__tweet',
+        '#user_link' => Link::fromTextAndUrl('@' . $tweet['user']['name'], Url::fromUri('https://twitter.com/' . $tweet['user']['screen_name'])),
+        '#text' => $tweet_text,
+        '#tweet' => $tweet,
+      ];
     }
     $build = [
       '#theme' => 'twitter_api__tweet_list',
       '#tweets' => $tweets,
+      '#cache' => [
+        'max-age' => 0,
+      ],
     ];
 
     return $build;
