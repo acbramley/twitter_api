@@ -2,6 +2,7 @@
 
 namespace Drupal\twitter_api;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
@@ -44,10 +45,25 @@ class TwitterApiClient implements TwitterApiClientInterface {
   }
 
   /**
+   * Returns the API url from config ensuring it has a trailing slash.
+   *
+   * @return string
+   *   The api url.
+   */
+  protected function getApiUrl() {
+    return rtrim($this->config->get('api_url'), ' /') . '/';
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function doGet($end_point, array $query_params) {
-    return [];
+    $exchange = new \TwitterAPIExchange($this->getClientSettings());
+    $response = $exchange->setGetfield(http_build_query($query_params))
+      ->buildOauth($this->getApiUrl() . $end_point, 'GET')
+      ->performRequest();
+
+    return Json::decode($response);
   }
 
   /**
