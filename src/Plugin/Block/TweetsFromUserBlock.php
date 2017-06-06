@@ -109,6 +109,7 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
         3600 => $this->t('5 minutes'),
         7200 => $this->t('10 minutes'),
       ],
+      '#default_value' => $this->configuration['cache'],
     ];
     return $form;
   }
