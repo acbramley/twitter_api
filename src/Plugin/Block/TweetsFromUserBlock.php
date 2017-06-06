@@ -117,6 +117,7 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
   public function build() {
     $response = $this->client->getTweets($this->configuration['screen_name'], $this->configuration['count']);
     $tweets = [];
+    // TODO: Move all of this into a better place. Preprocessor?
     foreach ($response as $tweet) {
       $tweet_text = $tweet['text'];
       // Replace any urls in the text.
@@ -125,12 +126,30 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
         $tweet_text = str_replace($replace, $url->toString(), $tweet_text);
       }
 
-      $tweets[] = [
+      // Remove any image urls in the text so they are themed separately.
+      $images = $this->expander->expandImages($tweet);
+      foreach ($images as $replace => $image_url) {
+        $tweet_text = str_replace($replace, '', $tweet_text);
+      }
+
+      $tweet_build = [
         '#theme' => 'twitter_api__tweet',
         '#user_link' => Link::fromTextAndUrl('@' . $tweet['user']['name'], Url::fromUri('https://twitter.com/' . $tweet['user']['screen_name'])),
         '#text' => new FormattableMarkup($tweet_text, []),
-        '#tweet' => $tweet,
+        '#timestamp' => strtotime($tweet['created_at']),
+        '#tweet_url' => Url::fromUri('https://twitter.com/' . $tweet['user']['screen_name'] . '/status/' . $tweet['id'])->toString(),
       ];
+
+      // Render the first image in the tweet.
+      if (!empty($images)) {
+        $tweet_build['#image'] = [
+          '#theme' => 'image',
+          '#uri' => array_shift($images),
+          '#alt' => $this->t('Photo 1'),
+        ];
+      }
+
+      $tweets[] = $tweet_build;
     }
     $build = [
       '#theme' => 'twitter_api__tweet_list',
