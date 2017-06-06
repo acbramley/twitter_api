@@ -5,6 +5,7 @@ namespace Drupal\twitter_api\Plugin\Block;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -78,6 +79,7 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
     return [
       'screen_name' => '',
       'count' => 3,
+      'cache' => 3600,
     ] + parent::baseConfigurationDefaults();
   }
 
@@ -99,6 +101,15 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
       '#required' => TRUE,
       '#default_value' => $this->configuration['count'],
     ];
+    $form['cache'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Cache time'),
+      '#options' => [
+        Cache::PERMANENT => $this->t('Forever'),
+        3600 => $this->t('5 minutes'),
+        7200 => $this->t('10 minutes'),
+      ],
+    ];
     return $form;
   }
 
@@ -108,6 +119,7 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['screen_name'] = $form_state->getValue('screen_name');
     $this->configuration['count'] = $form_state->getValue('count');
+    $this->configuration['cache'] = $form_state->getValue('cache');
     parent::submitConfigurationForm($form, $form_state);
   }
 
@@ -155,7 +167,7 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
       '#theme' => 'twitter_api__tweet_list',
       '#tweets' => $tweets,
       '#cache' => [
-        'max-age' => 0,
+        'max-age' => $this->configuration['cache'],
       ],
     ];
 
