@@ -32,7 +32,7 @@ class TwitterApiEntityExpanderTest extends KernelTestBase {
   }
 
   /**
-   * Tests the expand urls function.
+   * Tests the expandUrls function.
    */
   public function testExpandUrls() {
     // Example structure of a tweet with a url entity.
@@ -54,6 +54,27 @@ class TwitterApiEntityExpanderTest extends KernelTestBase {
 
     $actual = $this->expander->expandUrls($tweet);
     $this->assertEquals('<a href="https://twitter.com">twitter.com</a>', $actual['https://t.co/Vfe5BIiYt5']->toString());
+  }
+
+  /**
+   * Tests the expandImages function.
+   */
+  public function testExpandImages() {
+    // Example structure of a tweet with a media entity.
+    $tweet = [
+      'entities' => [
+        'media' => [
+          [
+            'type' => 'photo',
+            'url' => 'https://t.co/zmrNjq4kqU',
+            'media_url_https' => 'https://pbs.twimg.com/media/DBl1V26UwAAKy3G.jpg',
+          ],
+        ],
+      ],
+    ];
+
+    $actual = $this->expander->expandImages($tweet);
+    $this->assertEquals('https://pbs.twimg.com/media/DBl1V26UwAAKy3G.jpg', $actual['https://t.co/zmrNjq4kqU']);
   }
 
 }
