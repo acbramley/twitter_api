@@ -5,7 +5,9 @@ namespace Drupal\Tests\twitter_api\Kernel;
 use Drupal\Tests\token\Kernel\KernelTestBase;
 
 /**
- * Unit tests for the entity expander.
+ * Kernel tests for the entity expander.
+ *
+ * @group twitter_api
  */
 class TwitterApiEntityExpanderTest extends KernelTestBase {
 
