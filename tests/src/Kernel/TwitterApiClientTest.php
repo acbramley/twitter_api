@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\twitter_api\Kernel;
 
-use Drupal\Tests\token\Kernel\KernelTestBase;
+use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Kernel tests for the twitter API client.
