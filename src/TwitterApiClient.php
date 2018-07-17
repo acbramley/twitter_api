@@ -69,11 +69,7 @@ class TwitterApiClient implements TwitterApiClientInterface {
   /**
    * {@inheritdoc}
    */
-  public function getTweets($screen_name, $count = 3) {
-    $params = [
-      'screen_name' => $screen_name,
-      'count' => $count,
-    ];
+  public function getTweets(array $params) {
     return $this->doGet('statuses/user_timeline.json', $params);
   }
 

@@ -10,15 +10,13 @@ interface TwitterApiClientInterface {
   /**
    * Gets the latest tweets for a given user.
    *
-   * @param string $screen_name
-   *   The Twitter account name.
-   * @param int $count
-   *   The number of tweets to return.
+   * @param array $params
+   *   Paramaters to send to the Twitter API.
    *
    * @return array
    *   The decoded response.
    */
-  public function getTweets($screen_name, $count = 3);
+  public function getTweets(array $params);
 
   /**
    * Send a GET query to a specific endpoint with an optional array of params.
@@ -26,7 +24,7 @@ interface TwitterApiClientInterface {
    * @param string $end_point
    *   The url endpoint e.g statuses/user_timeline.json.
    * @param array $query_params
-   *   An optional array of query parameters.
+   *   An array of query parameters.
    *
    * @return array
    *   The decoded JSON response.

@@ -39,7 +39,7 @@ class TwitterApiClientTest extends KernelTestBase {
    * Tests the get tweets function.
    */
   public function testGetTweets() {
-    $tweets = $this->client->getTweets('drupaltestacc', 1);
+    $tweets = $this->client->getTweets(['screen_name' => 'countdrupaltestacc', 'count' => 1]);
     $this->assertNotEmpty($tweets);
     $this->assertContains('This is a test tweet', $tweets[0]['text']);
   }

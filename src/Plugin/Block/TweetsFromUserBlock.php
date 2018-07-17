@@ -128,7 +128,10 @@ class TweetsFromUserBlock extends BlockBase implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   public function build() {
-    $response = $this->client->getTweets($this->configuration['screen_name'], $this->configuration['count']);
+    $response = $this->client->getTweets([
+      'screen_name' => $this->configuration['screen_name'],
+      'count' => $this->configuration['count'],
+    ]);
     $tweets = [];
     // TODO: Move all of this into a better place. Preprocessor?
     foreach ($response as $tweet) {
